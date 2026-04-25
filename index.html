@@ -1,668 +1,685 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>GeoScraper Pro V3 | AI-Driven OSM Harvester</title>
-  
+  <title>GeoScraper | OSM Harvester</title>
+
   <!-- Leaflet Core + Plugins -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
-  
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css">
+
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  
+
   <!-- Font Awesome 6 (free) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<div class="dashboard">
-  <!-- SIDEBAR LEFT -->
-  <div class="sidebar">
-    <div class="header-logo" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-      <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-        <h2><i class="fas fa-satellite-dish" style="color: var(--accent);"></i> GeoScraper V3</h2>
-        <button id="darkModeToggle" class="btn-icon" title="Toggle Theme"><i class="fas fa-moon"></i></button>
-      </div>
-      <div style="font-size: 0.7rem; color: var(--text-secondary);">
-        by <a href="https://www.linkedin.com/in/radhyka-galih-pranata-b78249209" target="_blank" style="color: var(--accent); text-decoration: none; font-weight: 500;">Radhyka Galih Pranata</a>
-      </div>
-    </div>
-
-    <div class="card-modern">
-      <div class="section-title"><i class="fas fa-location-crosshairs"></i> Area Target</div>
-      <div class="input-group">
-        <input type="text" id="area-input" placeholder="Masukkan nama kota/wilayah..." value="Surakarta">
-      </div>
-      <div class="flex-row">
-        <button id="geocode-btn" class="btn-primary" style="flex:2">
-          <i class="fas fa-search"></i> <span>Cari</span>
-        </button>
-        <button id="draw-btn" class="btn-outline" style="flex:1" title="Gambar Polygon di Peta">
-          <i class="fas fa-draw-polygon"></i>
-        </button>
-      </div>
-      <div id="area-status" style="font-size:0.75rem; margin-top:10px; color: var(--text-secondary);">Belum ada area terpilih.</div>
-    </div>
-
-    <div class="card-modern">
-      <div class="section-title"><i class="fas fa-layer-group"></i> Kategori OSM</div>
-      <select id="cat-select">
-        <option value="amenity">Amenity (Fasilitas Umum)</option>
-        <option value="shop">Shop (Pusat Belanja)</option>
-        <option value="highway">Highway (Jalan Raya)</option>
-        <option value="landuse">Landuse (Penggunaan Lahan)</option>
-        <option value="natural">Natural (Alam)</option>
-        <option value="building">Building (Bangunan)</option>
-      </select>
-      <div style="display: flex; justify-content: space-between; margin: 15px 0 5px; align-items: center;">
-        <span class="section-title" style="margin:0"><i class="fas fa-tags"></i> Pilih Tag</span>
+  <div class="dashboard">
+    <!-- SIDEBAR LEFT -->
+    <div class="sidebar">
+      <div class="header-logo" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+        <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+          <h2><i class="fas fa-satellite-dish" style="color: var(--accent);"></i> GeoScraper</h2>
+          <button id="darkModeToggle" class="btn-icon" title="Toggle Theme"><i class="fas fa-moon"></i></button>
+        </div>
         <div style="font-size: 0.7rem; color: var(--text-secondary);">
-          <span id="selectAllBtn" style="cursor:pointer; border-bottom: 1px dashed;">Semua</span> | 
-          <span id="clearAllBtn" style="cursor:pointer; border-bottom: 1px dashed;">Hapus</span>
+          by <a href="https://www.linkedin.com/in/radhyka-galih-pranata-b78249209" target="_blank"
+            style="color: var(--accent); text-decoration: none; font-weight: 500;">Radhyka Galih Pranata</a>
         </div>
       </div>
-      <div id="tag-grid" class="tag-grid"></div>
-    </div>
 
-    <div class="card-modern">
-      <div class="section-title"><i class="fas fa-sliders"></i> Pengaturan Ekstraksi</div>
-      <div class="input-group">
-        <label>Timeout API (detik)</label>
-        <input type="number" id="timeout-input" value="45" min="10" max="180">
+      <div class="card-modern">
+        <div class="section-title"><i class="fas fa-location-crosshairs"></i> Area Target</div>
+        <div class="input-group">
+          <input type="text" id="area-input" placeholder="Masukkan nama kota/wilayah..." value="Surakarta">
+        </div>
+        <div class="flex-row">
+          <button id="geocode-btn" class="btn-primary" style="flex:2">
+            <i class="fas fa-search"></i> <span>Cari</span>
+          </button>
+          <button id="draw-btn" class="btn-outline" style="flex:1" title="Gambar Polygon di Peta">
+            <i class="fas fa-draw-polygon"></i>
+          </button>
+        </div>
+        <div id="area-status" style="font-size:0.75rem; margin-top:10px; color: var(--text-secondary);">Belum ada area
+          terpilih.</div>
       </div>
-      <div class="input-group">
-        <label>Jeda per Request (ms)</label>
-        <input type="number" id="delay-input" value="1500" min="500" step="100">
-      </div>
-      
-      <div class="progress-bar"><div id="scrape-progress-fill" class="progress-fill"></div></div>
-      
-      <button id="scrape-btn" class="btn-primary" style="margin-bottom: 10px;" disabled>
-        <i class="fas fa-cloud-bolt"></i> Mulai Ekstraksi
-      </button>
-      <button id="clear-map-btn" class="btn-outline btn-danger">
-        <i class="fas fa-trash-can"></i> Bersihkan Peta
-      </button>
-    </div>
-  </div>
 
-  <!-- MAP AREA -->
-  <div class="map-container">
-    <div id="osm-map"></div>
-    <button id="toggleRightPanel" class="toggle-right"><i class="fas fa-chart-pie"></i> Analitik</button>
-  </div>
-
-  <!-- RIGHT PANEL (Analytics & Data) -->
-  <div class="right-panel" id="rightPanel">
-    <div class="right-panel-header">
-      <div class="section-title" style="margin:0;"><i class="fas fa-chart-line"></i> Analitik Data</div>
-      <button class="mobile-close-btn" id="closeRightPanel"><i class="fas fa-times"></i></button>
-    </div>
-
-    <div class="card-modern">
-      <div class="stats-badge">
-        Total Ekstraksi <span id="total-features">0</span>
-      </div>
-      <div style="margin-bottom: 15px;">
-        <canvas id="pieChart" width="200" height="150" style="max-height: 160px;"></canvas>
-      </div>
-      <div>
-        <canvas id="barChart" width="200" height="130" style="max-height: 140px;"></canvas>
-      </div>
-    </div>
-
-    <div class="card-modern" style="flex: 1; display: flex; flex-direction: column;">
-      <div class="section-title"><i class="fas fa-table"></i> Tabel Data</div>
-      <div class="input-group flex-row">
-        <select id="geom-filter" style="flex:1;">
-          <option value="all">Semua Bentuk</option>
-          <option value="Point">Point (Titik)</option>
-          <option value="LineString">Line (Garis)</option>
-          <option value="Polygon">Polygon (Area)</option>
+      <div class="card-modern">
+        <div class="section-title"><i class="fas fa-layer-group"></i> Kategori OSM</div>
+        <select id="cat-select">
+          <option value="amenity">Amenity (Fasilitas Umum)</option>
+          <option value="shop">Shop (Pusat Belanja)</option>
+          <option value="highway">Highway (Jalan Raya)</option>
+          <option value="landuse">Landuse (Penggunaan Lahan)</option>
+          <option value="natural">Natural (Alam)</option>
+          <option value="building">Building (Bangunan)</option>
         </select>
-        <input type="text" id="table-filter" placeholder="Cari nama / tipe..." style="flex:2;">
+        <div style="display: flex; justify-content: space-between; margin: 15px 0 5px; align-items: center;">
+          <span class="section-title" style="margin:0"><i class="fas fa-tags"></i> Pilih Tag</span>
+          <div style="font-size: 0.7rem; color: var(--text-secondary);">
+            <span id="selectAllBtn" style="cursor:pointer; border-bottom: 1px dashed;">Semua</span> |
+            <span id="clearAllBtn" style="cursor:pointer; border-bottom: 1px dashed;">Hapus</span>
+          </div>
+        </div>
+        <div id="tag-grid" class="tag-grid"></div>
       </div>
-      <div class="table-container">
-        <table id="result-table">
-          <thead><tr><th>No</th><th>Nama</th><th>Tipe</th><th>Lon</th><th>Lat</th></tr></thead>
-          <tbody id="table-body"></tbody>
-        </table>
-      </div>
-      <div class="section-title" style="margin-top: 15px;"><i class="fas fa-download"></i> Export Data</div>
-      <div class="flex-row">
-        <button id="export-csv" class="btn-outline" style="flex:1" title="Export to CSV">CSV</button>
-        <button id="export-geojson" class="btn-outline" style="flex:1" title="Export to GeoJSON">GeoJSON</button>
-        <button id="export-kml" class="btn-outline" style="flex:1; border-color: var(--accent); color: var(--accent);" title="Export to KML">KML</button>
+
+      <div class="card-modern">
+        <div class="section-title"><i class="fas fa-sliders"></i> Pengaturan Ekstraksi</div>
+        <div class="input-group">
+          <label>Timeout API (detik)</label>
+          <input type="number" id="timeout-input" value="45" min="10" max="180">
+        </div>
+        <div class="input-group">
+          <label>Jeda per Request (ms)</label>
+          <input type="number" id="delay-input" value="1500" min="500" step="100">
+        </div>
+
+        <div class="progress-bar">
+          <div id="scrape-progress-fill" class="progress-fill"></div>
+        </div>
+
+        <button id="scrape-btn" class="btn-primary" style="margin-bottom: 10px;" disabled>
+          <i class="fas fa-cloud-bolt"></i> Mulai Ekstraksi
+        </button>
+        <button id="clear-map-btn" class="btn-outline btn-danger">
+          <i class="fas fa-trash-can"></i> Bersihkan Peta
+        </button>
       </div>
     </div>
 
-    <div class="card-modern">
-      <div class="section-title"><i class="fas fa-terminal"></i> Terminal Log</div>
-      <div id="log-area" class="log-area"></div>
+    <!-- MAP AREA -->
+    <div class="map-container">
+      <div id="osm-map"></div>
+      <button id="toggleRightPanel" class="toggle-right"><i class="fas fa-chart-pie"></i> Analitik</button>
+    </div>
+
+    <!-- RIGHT PANEL (Analytics & Data) -->
+    <div class="right-panel" id="rightPanel">
+      <div class="right-panel-header">
+        <div class="section-title" style="margin:0;"><i class="fas fa-chart-line"></i> Analitik Data</div>
+        <button class="mobile-close-btn" id="closeRightPanel"><i class="fas fa-times"></i></button>
+      </div>
+
+      <div class="card-modern">
+        <div class="stats-badge">
+          Total Ekstraksi <span id="total-features">0</span>
+        </div>
+        <div style="margin-bottom: 15px;">
+          <canvas id="pieChart" width="200" height="150" style="max-height: 160px;"></canvas>
+        </div>
+        <div>
+          <canvas id="barChart" width="200" height="130" style="max-height: 140px;"></canvas>
+        </div>
+      </div>
+
+      <div class="card-modern" style="flex: 1; display: flex; flex-direction: column;">
+        <div class="section-title"><i class="fas fa-table"></i> Tabel Data</div>
+        <div class="input-group flex-row">
+          <select id="geom-filter" style="flex:1;">
+            <option value="all">Semua Bentuk</option>
+            <option value="Point">Point (Titik)</option>
+            <option value="LineString">Line (Garis)</option>
+            <option value="Polygon">Polygon (Area)</option>
+          </select>
+          <input type="text" id="table-filter" placeholder="Cari nama / tipe..." style="flex:2;">
+        </div>
+        <div class="table-container">
+          <table id="result-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Tipe</th>
+                <th>Lon</th>
+                <th>Lat</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+          </table>
+        </div>
+        <div class="section-title" style="margin-top: 15px;"><i class="fas fa-download"></i> Export Data</div>
+        <div class="flex-row">
+          <button id="export-csv" class="btn-outline" style="flex:1" title="Export to CSV">CSV</button>
+          <button id="export-geojson" class="btn-outline" style="flex:1" title="Export to GeoJSON">GeoJSON</button>
+          <button id="export-kml" class="btn-outline" style="flex:1; border-color: var(--accent); color: var(--accent);"
+            title="Export to KML">KML</button>
+        </div>
+      </div>
+
+      <div class="card-modern">
+        <div class="section-title"><i class="fas fa-terminal"></i> Terminal Log</div>
+        <div id="log-area" class="log-area"></div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- CDN SCRIPTS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+  <!-- CDN SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
 
-<script>
-  // -------------------------- GLOBAL STATE & CONFIG --------------------------
-  const TAGS_DB = {
-    amenity: [{v:'hospital',l:'RS'},{v:'clinic',l:'Klinik'},{v:'school',l:'Sekolah'},{v:'university',l:'Univ'},{v:'bank',l:'Bank'},{v:'restaurant',l:'Resto'},{v:'cafe',l:'Kafe'},{v:'fuel',l:'SPBU'},{v:'place_of_worship',l:'Tempat Ibadah'}],
-    shop: [{v:'supermarket',l:'Supermarket'},{v:'convenience',l:'Minimarket'},{v:'clothes',l:'Baju'},{v:'electronics',l:'Elektronik'},{v:'mall',l:'Mall'}],
-    highway: [{v:'primary',l:'Primer'},{v:'secondary',l:'Sekunder'},{v:'tertiary',l:'Tersier'},{v:'residential',l:'Perumahan'}],
-    landuse: [{v:'residential',l:'Pemukiman'},{v:'commercial',l:'Komersial'},{v:'industrial',l:'Industri'},{v:'forest',l:'Hutan'}],
-    natural: [{v:'water',l:'Air'},{v:'wood',l:'Hutan'},{v:'peak',l:'Puncak Gunung'}],
-    building: [{v:'yes',l:'Bangunan Umum'},{v:'house',l:'Rumah'},{v:'apartments',l:'Apartemen'}]
-  };
-  const CAT_COLORS = { amenity:'#10b981', shop:'#8b5cf6', highway:'#f59e0b', landuse:'#06b6d4', natural:'#14b8a6', building:'#64748b' };
-  const CHART_COLORS = ['#10b981','#3b82f6','#f59e0b','#ef4444','#8b5cf6','#ec489a','#06b6d4'];
+  <script>
+    // -------------------------- GLOBAL STATE & CONFIG --------------------------
+    const TAGS_DB = {
+      amenity: [{ v: 'hospital', l: 'RS' }, { v: 'clinic', l: 'Klinik' }, { v: 'school', l: 'Sekolah' }, { v: 'university', l: 'Univ' }, { v: 'bank', l: 'Bank' }, { v: 'restaurant', l: 'Resto' }, { v: 'cafe', l: 'Kafe' }, { v: 'fuel', l: 'SPBU' }, { v: 'place_of_worship', l: 'Tempat Ibadah' }],
+      shop: [{ v: 'supermarket', l: 'Supermarket' }, { v: 'convenience', l: 'Minimarket' }, { v: 'clothes', l: 'Baju' }, { v: 'electronics', l: 'Elektronik' }, { v: 'mall', l: 'Mall' }],
+      highway: [{ v: 'primary', l: 'Primer' }, { v: 'secondary', l: 'Sekunder' }, { v: 'tertiary', l: 'Tersier' }, { v: 'residential', l: 'Perumahan' }],
+      landuse: [{ v: 'residential', l: 'Pemukiman' }, { v: 'commercial', l: 'Komersial' }, { v: 'industrial', l: 'Industri' }, { v: 'forest', l: 'Hutan' }],
+      natural: [{ v: 'water', l: 'Air' }, { v: 'wood', l: 'Hutan' }, { v: 'peak', l: 'Puncak Gunung' }],
+      building: [{ v: 'yes', l: 'Bangunan Umum' }, { v: 'house', l: 'Rumah' }, { v: 'apartments', l: 'Apartemen' }]
+    };
+    const CAT_COLORS = { amenity: '#10b981', shop: '#8b5cf6', highway: '#f59e0b', landuse: '#06b6d4', natural: '#14b8a6', building: '#64748b' };
+    const CHART_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec489a', '#06b6d4'];
 
-  let map, drawnItems, bbox = null, resultsArray = [], markerClusterGroup, geoJsonLayer;
-  let pieChart, barChart, fullChartMap = {};
-  let currentExportData = [];
-  let currentCategory = 'amenity';
-  
-  // DOM Elements
-  const logDiv = document.getElementById('log-area');
-  const statusDiv = document.getElementById('area-status');
-  const scrapeBtn = document.getElementById('scrape-btn');
-  const geocodeBtn = document.getElementById('geocode-btn');
-  const geocodeBtnText = geocodeBtn.querySelector('span');
-  const geocodeBtnIcon = geocodeBtn.querySelector('i');
-  
-  // Helpers
-  function addLog(msg, type='info') { 
-    const entry = document.createElement('div'); 
-    entry.className = 'log-entry';
-    const time = new Date().toLocaleTimeString('id-ID', {hour12: false});
-    entry.innerHTML = `<span style="color:#64748b">[${time}]</span> ${msg}`; 
-    entry.style.color = type==='error' ? 'var(--danger)' : (type==='success' ? 'var(--accent)' : 'var(--text-secondary)'); 
-    logDiv.prepend(entry); 
-    if(logDiv.children.length>40) logDiv.removeChild(logDiv.lastChild); 
-  }
-  
-  function toast(msg, type='success') { 
-    let t = document.createElement('div'); 
-    t.className='toast-notif'; 
-    if(type==='error') { t.style.borderLeftColor = 'var(--danger)'; t.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--danger)"></i> &nbsp; ${msg}`; }
-    else t.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent)"></i> &nbsp; ${msg}`;
-    document.body.appendChild(t); 
-    setTimeout(()=>t.remove(), 3500); 
-  }
-  
-  // ---------- Map Init ----------
-  function initMap() {
-    map = L.map('osm-map', { zoomControl: false }).setView([-7.5566,110.8316], 13);
-    L.control.zoom({ position: 'bottomleft' }).addTo(map);
-    
-    // Darker map tiles for better contrast with neon theme
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-      attribution: '© OpenStreetMap contributors © CARTO',
-      subdomains: 'abcd', maxZoom: 20
-    }).addTo(map);
+    let map, drawnItems, bbox = null, resultsArray = [], markerClusterGroup, geoJsonLayer;
+    let pieChart, barChart, fullChartMap = {};
+    let currentExportData = [];
+    let currentCategory = 'amenity';
 
-    drawnItems = new L.FeatureGroup(); 
-    map.addLayer(drawnItems);
-    
-    const drawControl = new L.Control.Draw({ 
-      draw: { polygon: true, rectangle: true, circle: false, marker: false, polyline: false, circlemarker: false }, 
-      edit: { featureGroup: drawnItems } 
-    });
-    map.addControl(drawControl);
-    
-    map.on(L.Draw.Event.CREATED, e => { 
-      drawnItems.clearLayers(); // Only allow 1 area at a time
-      drawnItems.addLayer(e.layer); 
-      const b = e.layer.getBounds(); 
-      bbox = {s:b.getSouth(), w:b.getWest(), n:b.getNorth(), e:b.getEast()}; 
-      statusDiv.innerHTML = `<span style="color:var(--accent)"><i class="fas fa-check"></i> Area kustom berhasil dibuat.</span>`; 
-      scrapeBtn.disabled=false; 
-      addLog('Area polygon kustom diaktifkan.', 'success'); 
-    });
-    
-    markerClusterGroup = L.markerClusterGroup({ chunkedLoading: true }); 
-    map.addLayer(markerClusterGroup);
-    geoJsonLayer = L.layerGroup(); 
-    map.addLayer(geoJsonLayer);
-  }
+    // DOM Elements
+    const logDiv = document.getElementById('log-area');
+    const statusDiv = document.getElementById('area-status');
+    const scrapeBtn = document.getElementById('scrape-btn');
+    const geocodeBtn = document.getElementById('geocode-btn');
+    const geocodeBtnText = geocodeBtn.querySelector('span');
+    const geocodeBtnIcon = geocodeBtn.querySelector('i');
 
-  // Tags rendering
-  function renderTags() {
-    currentCategory = document.getElementById('cat-select').value;
-    const tags = TAGS_DB[currentCategory] || [];
-    const grid = document.getElementById('tag-grid');
-    grid.innerHTML = tags.map(t => `<label class="tag-item"><input type="checkbox" value="${t.v}" checked> ${t.l}</label>`).join('');
-  }
-  function getCheckedTags() { return [...document.querySelectorAll('#tag-grid input:checked')].map(cb => cb.value); }
-  
-  // Query Builder
-  function buildOverpassQuery(cat, tags, bbox, timeoutSec) {
-    const bb = `${bbox.s},${bbox.w},${bbox.n},${bbox.e}`;
-    const queries = tags.flatMap(t => [`node["${cat}"="${t}"](${bb});`, `way["${cat}"="${t}"](${bb});`, `relation["${cat}"="${t}"](${bb});`]).join('\n');
-    return `[out:json][timeout:${timeoutSec}];\n(\n${queries}\n);\nout body geom;`;
-  }
-  
-  // BATCH Scrape
-  async function runBatchScrape() {
-    if(!bbox) { toast('Pilih area target terlebih dahulu!','error'); return; }
-    let tags = getCheckedTags();
-    if(tags.length===0) { toast('Pilih minimal 1 tag!','error'); return; }
-    
-    const cat = currentCategory;
-    const timeoutVal = parseInt(document.getElementById('timeout-input').value);
-    const delayMs = parseInt(document.getElementById('delay-input').value);
-    const BATCH_SIZE = 4;
-    
-    let allElements = [];
-    const batches = [];
-    for(let i=0;i<tags.length;i+=BATCH_SIZE) batches.push(tags.slice(i,i+BATCH_SIZE));
-    
-    let completed=0;
-    scrapeBtn.disabled = true;
-    scrapeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengekstrak...';
-    document.getElementById('scrape-progress-fill').style.width='0%';
-    addLog(`Memulai ekstraksi: ${tags.length} tag, ${batches.length} antrean.`);
-    
-    for(let idx=0; idx<batches.length; idx++) {
-      const batchTags = batches[idx];
-      let success = false;
-      const MAX_RETRY = 3;
-      
-      for(let attempt=1; attempt<=MAX_RETRY; attempt++) {
-        try {
-          addLog(`Mengekstrak antrean ${idx+1}/${batches.length} [${batchTags.join(', ')}]...`);
-          const query = buildOverpassQuery(cat, batchTags, bbox, timeoutVal);
-          
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), (timeoutVal+10)*1000);
-          
-          const res = await fetch('https://overpass-api.de/api/interpreter', {
-            method: 'POST', body: 'data='+encodeURIComponent(query),
-            headers: {'Content-Type':'application/x-www-form-urlencoded'},
-            signal: controller.signal
+    // Helpers
+    function addLog(msg, type = 'info') {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const time = new Date().toLocaleTimeString('id-ID', { hour12: false });
+      entry.innerHTML = `<span style="color:#64748b">[${time}]</span> ${msg}`;
+      entry.style.color = type === 'error' ? 'var(--danger)' : (type === 'success' ? 'var(--accent)' : 'var(--text-secondary)');
+      logDiv.prepend(entry);
+      if (logDiv.children.length > 40) logDiv.removeChild(logDiv.lastChild);
+    }
+
+    function toast(msg, type = 'success') {
+      let t = document.createElement('div');
+      t.className = 'toast-notif';
+      if (type === 'error') { t.style.borderLeftColor = 'var(--danger)'; t.innerHTML = `<i class="fas fa-exclamation-circle" style="color:var(--danger)"></i> &nbsp; ${msg}`; }
+      else t.innerHTML = `<i class="fas fa-check-circle" style="color:var(--accent)"></i> &nbsp; ${msg}`;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 3500);
+    }
+
+    // ---------- Map Init ----------
+    function initMap() {
+      map = L.map('osm-map', { zoomControl: false }).setView([-7.5566, 110.8316], 13);
+      L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+      // Darker map tiles for better contrast with neon theme
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors © CARTO',
+        subdomains: 'abcd', maxZoom: 20
+      }).addTo(map);
+
+      drawnItems = new L.FeatureGroup();
+      map.addLayer(drawnItems);
+
+      const drawControl = new L.Control.Draw({
+        draw: { polygon: true, rectangle: true, circle: false, marker: false, polyline: false, circlemarker: false },
+        edit: { featureGroup: drawnItems }
+      });
+      map.addControl(drawControl);
+
+      map.on(L.Draw.Event.CREATED, e => {
+        drawnItems.clearLayers(); // Only allow 1 area at a time
+        drawnItems.addLayer(e.layer);
+        const b = e.layer.getBounds();
+        bbox = { s: b.getSouth(), w: b.getWest(), n: b.getNorth(), e: b.getEast() };
+        statusDiv.innerHTML = `<span style="color:var(--accent)"><i class="fas fa-check"></i> Area kustom berhasil dibuat.</span>`;
+        scrapeBtn.disabled = false;
+        addLog('Area polygon kustom diaktifkan.', 'success');
+      });
+
+      markerClusterGroup = L.markerClusterGroup({ chunkedLoading: true });
+      map.addLayer(markerClusterGroup);
+      geoJsonLayer = L.layerGroup();
+      map.addLayer(geoJsonLayer);
+    }
+
+    // Tags rendering
+    function renderTags() {
+      currentCategory = document.getElementById('cat-select').value;
+      const tags = TAGS_DB[currentCategory] || [];
+      const grid = document.getElementById('tag-grid');
+      grid.innerHTML = tags.map(t => `<label class="tag-item"><input type="checkbox" value="${t.v}" checked> ${t.l}</label>`).join('');
+    }
+    function getCheckedTags() { return [...document.querySelectorAll('#tag-grid input:checked')].map(cb => cb.value); }
+
+    // Query Builder
+    function buildOverpassQuery(cat, tags, bbox, timeoutSec) {
+      const bb = `${bbox.s},${bbox.w},${bbox.n},${bbox.e}`;
+      const queries = tags.flatMap(t => [`node["${cat}"="${t}"](${bb});`, `way["${cat}"="${t}"](${bb});`, `relation["${cat}"="${t}"](${bb});`]).join('\n');
+      return `[out:json][timeout:${timeoutSec}];\n(\n${queries}\n);\nout body geom;`;
+    }
+
+    // BATCH Scrape
+    async function runBatchScrape() {
+      if (!bbox) { toast('Pilih area target terlebih dahulu!', 'error'); return; }
+      let tags = getCheckedTags();
+      if (tags.length === 0) { toast('Pilih minimal 1 tag!', 'error'); return; }
+
+      const cat = currentCategory;
+      const timeoutVal = parseInt(document.getElementById('timeout-input').value);
+      const delayMs = parseInt(document.getElementById('delay-input').value);
+      const BATCH_SIZE = 4;
+
+      let allElements = [];
+      const batches = [];
+      for (let i = 0; i < tags.length; i += BATCH_SIZE) batches.push(tags.slice(i, i + BATCH_SIZE));
+
+      let completed = 0;
+      scrapeBtn.disabled = true;
+      scrapeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengekstrak...';
+      document.getElementById('scrape-progress-fill').style.width = '0%';
+      addLog(`Memulai ekstraksi: ${tags.length} tag, ${batches.length} antrean.`);
+
+      for (let idx = 0; idx < batches.length; idx++) {
+        const batchTags = batches[idx];
+        let success = false;
+        const MAX_RETRY = 3;
+
+        for (let attempt = 1; attempt <= MAX_RETRY; attempt++) {
+          try {
+            addLog(`Mengekstrak antrean ${idx + 1}/${batches.length} [${batchTags.join(', ')}]...`);
+            const query = buildOverpassQuery(cat, batchTags, bbox, timeoutVal);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), (timeoutVal + 10) * 1000);
+
+            const res = await fetch('https://overpass-api.de/api/interpreter', {
+              method: 'POST', body: 'data=' + encodeURIComponent(query),
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+
+            if (res.status === 429) throw new Error('Too Many Requests (Rate Limit)');
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+            const data = await res.json();
+            allElements.push(...(data.elements || []));
+            success = true;
+            break; // Success, break retry loop
+          } catch (err) {
+            addLog(`Error antrean ${idx + 1} (Percobaan ${attempt}): ${err.message}`, 'error');
+            if (attempt === MAX_RETRY) {
+              toast(`Antrean ${idx + 1} gagal setelah ${MAX_RETRY}x percobaan.`, 'error');
+            } else {
+              addLog(`Menunggu 3 detik sebelum mencoba lagi...`);
+              await new Promise(r => setTimeout(r, 3000));
+            }
+          }
+        }
+
+        completed++;
+        document.getElementById('scrape-progress-fill').style.width = ((completed / batches.length) * 100) + '%';
+        if (idx !== batches.length - 1 && delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+      }
+
+      scrapeBtn.innerHTML = '<i class="fas fa-cloud-bolt"></i> Mulai Ekstraksi';
+      scrapeBtn.disabled = false;
+      processAndRenderData(allElements, cat);
+    }
+
+    // Data Processor
+    function processAndRenderData(elements, cat) {
+      if (markerClusterGroup) markerClusterGroup.clearLayers();
+      if (geoJsonLayer) geoJsonLayer.clearLayers();
+
+      const color = CAT_COLORS[cat] || '#10b981';
+      resultsArray = [];
+      fullChartMap = {};
+
+      elements.forEach(el => {
+        const tags = el.tags || {};
+        const name = tags.name || '(Tanpa Nama)';
+        const typeVal = tags[cat] || 'Lainnya';
+
+        fullChartMap[typeVal] = (fullChartMap[typeVal] || 0) + 1;
+        let geometry = null;
+        let latlon = null;
+        let isPoly = false;
+
+        if (el.type === 'node') {
+          latlon = [el.lat, el.lon];
+          geometry = { type: 'Point', coordinates: [el.lon, el.lat] };
+        } else if ((el.type === 'way' || el.type === 'relation') && el.geometry) {
+          const coords = el.geometry.map(g => [g.lon, g.lat]); // GeoJSON is [lon, lat]
+          if (coords.length > 2 && coords[0][0] === coords[coords.length - 1][0] && coords[0][1] === coords[coords.length - 1][1]) {
+            isPoly = true;
+            geometry = { type: 'Polygon', coordinates: [coords] };
+          } else {
+            geometry = { type: 'LineString', coordinates: coords };
+          }
+          latlon = [el.geometry[0].lat, el.geometry[0].lon]; // For table/marker approximation
+        }
+
+        if (geometry && latlon) {
+          resultsArray.push({
+            no: resultsArray.length + 1,
+            name, tipe: typeVal,
+            lat: latlon[0], lon: latlon[1],
+            osm_id: el.id,
+            geometry: geometry
           });
-          clearTimeout(timeoutId);
-          
-          if(res.status === 429) throw new Error('Too Many Requests (Rate Limit)');
-          if(!res.ok) throw new Error(`HTTP ${res.status}`);
-          
-          const data = await res.json();
-          allElements.push(...(data.elements||[]));
-          success = true;
-          break; // Success, break retry loop
-        } catch(err) {
-          addLog(`Error antrean ${idx+1} (Percobaan ${attempt}): ${err.message}`, 'error');
-          if(attempt === MAX_RETRY) {
-            toast(`Antrean ${idx+1} gagal setelah ${MAX_RETRY}x percobaan.`, 'error');
+
+          // Add to map
+          const popupContent = `<div style="font-family:'Inter',sans-serif;"><b style="font-size:14px;color:#0f172a">${name}</b><br><span style="color:#64748b">${cat}: ${typeVal}</span></div>`;
+
+          if (geometry.type === 'Point') {
+            const m = L.circleMarker(latlon, { radius: 6, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9 });
+            m.bindPopup(popupContent);
+            markerClusterGroup.addLayer(m);
           } else {
-            addLog(`Menunggu 3 detik sebelum mencoba lagi...`);
-            await new Promise(r => setTimeout(r, 3000));
+            const lCoords = geometry.type === 'Polygon' ? geometry.coordinates[0].map(c => [c[1], c[0]]) : geometry.coordinates.map(c => [c[1], c[0]]);
+            let layer;
+            if (geometry.type === 'Polygon') {
+              layer = L.polygon(lCoords, { color, weight: 2, fillColor: color, fillOpacity: 0.2 });
+            } else {
+              layer = L.polyline(lCoords, { color, weight: 3 });
+            }
+            layer.bindPopup(popupContent);
+            geoJsonLayer.addLayer(layer);
           }
         }
-      }
-      
-      completed++;
-      document.getElementById('scrape-progress-fill').style.width = ((completed/batches.length)*100)+'%';
-      if(idx !== batches.length-1 && delayMs>0) await new Promise(r => setTimeout(r, delayMs));
-    }
-    
-    scrapeBtn.innerHTML = '<i class="fas fa-cloud-bolt"></i> Mulai Ekstraksi';
-    scrapeBtn.disabled = false;
-    processAndRenderData(allElements, cat);
-  }
-  
-  // Data Processor
-  function processAndRenderData(elements, cat) {
-    if(markerClusterGroup) markerClusterGroup.clearLayers();
-    if(geoJsonLayer) geoJsonLayer.clearLayers();
-    
-    const color = CAT_COLORS[cat] || '#10b981';
-    resultsArray = [];
-    fullChartMap = {};
-    
-    elements.forEach(el => {
-      const tags = el.tags || {};
-      const name = tags.name || '(Tanpa Nama)';
-      const typeVal = tags[cat] || 'Lainnya';
-      
-      fullChartMap[typeVal] = (fullChartMap[typeVal]||0)+1;
-      let geometry = null;
-      let latlon = null;
-      let isPoly = false;
+      });
 
-      if(el.type === 'node') {
-        latlon = [el.lat, el.lon];
-        geometry = { type: 'Point', coordinates: [el.lon, el.lat] };
-      } else if((el.type === 'way' || el.type === 'relation') && el.geometry) {
-        const coords = el.geometry.map(g => [g.lon, g.lat]); // GeoJSON is [lon, lat]
-        if(coords.length > 2 && coords[0][0] === coords[coords.length-1][0] && coords[0][1] === coords[coords.length-1][1]) {
-          isPoly = true;
-          geometry = { type: 'Polygon', coordinates: [coords] };
-        } else {
-          geometry = { type: 'LineString', coordinates: coords };
-        }
-        latlon = [el.geometry[0].lat, el.geometry[0].lon]; // For table/marker approximation
+      document.getElementById('total-features').innerText = resultsArray.length;
+      addLog(`Berhasil merender ${resultsArray.length} fitur.`, 'success');
+      toast(`Berhasil memuat ${resultsArray.length} data`);
+
+      if (resultsArray.length > 0) {
+        const bounds = markerClusterGroup.getBounds();
+        if (bounds.isValid()) map.fitBounds(bounds, { padding: [50, 50] });
+        else if (geoJsonLayer.getBounds().isValid()) map.fitBounds(geoJsonLayer.getBounds(), { padding: [50, 50] });
       }
 
-      if(geometry && latlon) {
-        resultsArray.push({
-          no: resultsArray.length + 1, 
-          name, tipe: typeVal, 
-          lat: latlon[0], lon: latlon[1], 
-          osm_id: el.id, 
-          geometry: geometry
-        });
+      // Sort chart data initially
+      fullChartMap = sortObjectByValue(fullChartMap);
+      currentExportData = resultsArray;
+      updateTable(currentExportData);
+      renderCharts(fullChartMap); // Base chart render
+    }
 
-        // Add to map
-        const popupContent = `<div style="font-family:'Inter',sans-serif;"><b style="font-size:14px;color:#0f172a">${name}</b><br><span style="color:#64748b">${cat}: ${typeVal}</span></div>`;
-        
-        if(geometry.type === 'Point') {
-          const m = L.circleMarker(latlon, {radius: 6, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9});
-          m.bindPopup(popupContent);
-          markerClusterGroup.addLayer(m);
-        } else {
-          const lCoords = geometry.type === 'Polygon' ? geometry.coordinates[0].map(c=>[c[1],c[0]]) : geometry.coordinates.map(c=>[c[1],c[0]]);
-          let layer;
-          if(geometry.type === 'Polygon') {
-            layer = L.polygon(lCoords, {color, weight: 2, fillColor: color, fillOpacity: 0.2});
-          } else {
-            layer = L.polyline(lCoords, {color, weight: 3});
-          }
-          layer.bindPopup(popupContent);
-          geoJsonLayer.addLayer(layer);
-        }
+    function sortObjectByValue(obj) {
+      return Object.fromEntries(Object.entries(obj).sort(([, a], [, b]) => b - a));
+    }
+
+    // Update Table 
+    function updateTable(data) {
+      const tbody = document.getElementById('table-body');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary)">Tidak ada data ditemukan</td></tr>`;
+        return;
       }
-    });
-
-    document.getElementById('total-features').innerText = resultsArray.length;
-    addLog(`Berhasil merender ${resultsArray.length} fitur.`, 'success');
-    toast(`Berhasil memuat ${resultsArray.length} data`);
-    
-    if(resultsArray.length > 0) {
-      const bounds = markerClusterGroup.getBounds();
-      if(bounds.isValid()) map.fitBounds(bounds, {padding: [50,50]});
-      else if(geoJsonLayer.getBounds().isValid()) map.fitBounds(geoJsonLayer.getBounds(), {padding: [50,50]});
-    }
-
-    // Sort chart data initially
-    fullChartMap = sortObjectByValue(fullChartMap);
-    currentExportData = resultsArray;
-    updateTable(currentExportData);
-    renderCharts(fullChartMap); // Base chart render
-  }
-
-  function sortObjectByValue(obj) {
-    return Object.fromEntries(Object.entries(obj).sort(([,a],[,b]) => b - a));
-  }
-  
-  // Update Table 
-  function updateTable(data) {
-    const tbody = document.getElementById('table-body');
-    if(data.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary)">Tidak ada data ditemukan</td></tr>`;
-      return;
-    }
-    tbody.innerHTML = data.slice(0, 500).map((r,i) => `
+      tbody.innerHTML = data.slice(0, 500).map((r, i) => `
       <tr style="cursor:pointer" onclick="zoomToFeature(${r.lat}, ${r.lon})" title="Klik untuk melihat di peta">
-        <td>${i+1}</td>
+        <td>${i + 1}</td>
         <td style="font-weight:500">${r.name}</td>
-        <td><span style="background:var(--border); padding:2px 6px; border-radius:6px; font-size:0.7rem;">${r.tipe}</span> <span style="font-size:0.6rem; color:var(--accent)">${r.geometry.type.substring(0,4)}</span></td>
+        <td><span style="background:var(--border); padding:2px 6px; border-radius:6px; font-size:0.7rem;">${r.tipe}</span> <span style="font-size:0.6rem; color:var(--accent)">${r.geometry.type.substring(0, 4)}</span></td>
         <td>${r.lon.toFixed(5)}</td>
         <td>${r.lat.toFixed(5)}</td>
       </tr>
     `).join('');
-  }
-
-  function zoomToFeature(lat, lon) {
-    map.setView([lat, lon], 18, { animate: true });
-    // Auto-close right panel on mobile after click
-    if(window.innerWidth <= 1000) { document.getElementById('rightPanel').classList.remove('open'); }
-  }
-
-  // Render Charts (Top 6)
-  function renderCharts(chartDataObj) {
-    const keys = Object.keys(chartDataObj).slice(0, 6);
-    const counts = keys.map(k => chartDataObj[k]);
-    
-    const chartOptions = {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'right', labels: { color: getComputedStyle(document.body).getPropertyValue('--text-primary'), font: {family: 'Inter', size: 10} } }
-      }
-    };
-
-    if(pieChart) pieChart.destroy();
-    if(barChart) barChart.destroy();
-    
-    const ctxPie = document.getElementById('pieChart').getContext('2d');
-    pieChart = new Chart(ctxPie, { 
-      type: 'doughnut', 
-      data: { labels: keys, datasets: [{ data: counts, backgroundColor: CHART_COLORS, borderWidth: 0 }] },
-      options: chartOptions
-    });
-    
-    const ctxBar = document.getElementById('barChart').getContext('2d');
-    barChart = new Chart(ctxBar, { 
-      type: 'bar', 
-      data: { labels: keys, datasets: [{ label: 'Jumlah', data: counts, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 4 }] },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary'), font: {size: 10} }, grid: { display: false } },
-          y: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary'), font: {size: 10} }, grid: { color: getComputedStyle(document.body).getPropertyValue('--border') } }
-        }
-      }
-    });
-  }
-
-  // Handle Table Filter
-  function applyFilters() {
-    const term = document.getElementById('table-filter').value.toLowerCase();
-    const geom = document.getElementById('geom-filter') ? document.getElementById('geom-filter').value : 'all';
-    
-    currentExportData = resultsArray.filter(r => {
-      const matchText = r.name.toLowerCase().includes(term) || r.tipe.toLowerCase().includes(term);
-      const matchGeom = geom === 'all' || r.geometry.type === geom;
-      return matchText && matchGeom;
-    });
-    
-    updateTable(currentExportData);
-    
-    // Recalculate chart data based on filter
-    let filteredChartMap = {};
-    currentExportData.forEach(r => { filteredChartMap[r.tipe] = (filteredChartMap[r.tipe]||0) + 1; });
-    filteredChartMap = sortObjectByValue(filteredChartMap);
-    renderCharts(filteredChartMap);
-  }
-
-  document.getElementById('table-filter').addEventListener('input', applyFilters);
-  document.getElementById('geom-filter').addEventListener('change', applyFilters);
-  
-  // Geocode Function
-  async function geocodeArea() {
-    const q = document.getElementById('area-input').value;
-    if(!q) return;
-    
-    geocodeBtnIcon.className = 'fas fa-spinner fa-spin';
-    geocodeBtnText.innerText = 'Mencari...';
-    geocodeBtn.disabled = true;
-    
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`, {headers:{'User-Agent':'GeoScraperV3'}});
-      const data = await res.json();
-      
-      if(!data.length) throw new Error('Lokasi tidak ditemukan');
-      
-      const bb = data[0].boundingbox;
-      bbox = {s:+bb[0], n:+bb[1], w:+bb[2], e:+bb[3]};
-      
-      if(window.bboxRect) map.removeLayer(window.bboxRect);
-      window.bboxRect = L.rectangle([[bbox.s,bbox.w],[bbox.n,bbox.e]], {color:'var(--accent)', weight:2, fillOpacity:0.1}).addTo(map);
-      map.fitBounds([[bbox.s,bbox.w],[bbox.n,bbox.e]]);
-      
-      const displayName = data[0].display_name.split(',')[0];
-      statusDiv.innerHTML = `<span style="color:var(--accent)"><i class="fas fa-check"></i> Target: ${displayName}</span>`;
-      scrapeBtn.disabled = false;
-      addLog(`Geocode sukses: ${displayName}`, 'success');
-    } catch(e) { 
-      statusDiv.innerHTML = `<span style="color:var(--danger)"><i class="fas fa-times"></i> ${e.message}</span>`;
-      toast(e.message, 'error');
-    } finally {
-      geocodeBtnIcon.className = 'fas fa-search';
-      geocodeBtnText.innerText = 'Cari';
-      geocodeBtn.disabled = false;
     }
-  }
-  
-  // Data Export Functions
-  function downloadGeoJSON() { 
-    if(!currentExportData.length) return toast('Tidak ada data untuk dieksport', 'error');
-    const fc = {
-      type: 'FeatureCollection', 
-      features: currentExportData.map(r => ({
-        type: 'Feature', 
-        geometry: r.geometry, 
-        properties: { name: r.name, tipe: r.tipe, osm_id: r.osm_id }
-      }))
-    };
-    triggerDownload(JSON.stringify(fc), 'application/json', 'geoscraper_export.geojson');
-  }
 
-  function downloadCSV() { 
-    if(!currentExportData.length) return toast('Tidak ada data untuk dieksport', 'error');
-    let csv = "No,Nama,Tipe,Lon,Lat,OSM_ID\n" + currentExportData.map(r=>`${r.no},"${r.name.replace(/"/g,'""')}",${r.tipe},${r.lon},${r.lat},${r.osm_id}`).join("\n");
-    triggerDownload(csv, 'text/csv', 'geoscraper_export.csv');
-  }
+    function zoomToFeature(lat, lon) {
+      map.setView([lat, lon], 18, { animate: true });
+      // Auto-close right panel on mobile after click
+      if (window.innerWidth <= 1000) { document.getElementById('rightPanel').classList.remove('open'); }
+    }
 
-  function downloadKML() {
-    if(!currentExportData.length) return toast('Tidak ada data untuk dieksport', 'error');
-    let kml = `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n    <name>GeoScraper Export</name>\n`;
-    
-    currentExportData.forEach(r => {
-      kml += `    <Placemark>\n      <name><![CDATA[${r.name}]]></name>\n`;
-      kml += `      <ExtendedData><Data name="tipe"><value>${r.tipe}</value></Data><Data name="osm_id"><value>${r.osm_id}</value></Data></ExtendedData>\n`;
-      
-      if (r.geometry.type === 'Point') {
-        kml += `      <Point><coordinates>${r.geometry.coordinates[0]},${r.geometry.coordinates[1]}</coordinates></Point>\n`;
-      } else if (r.geometry.type === 'LineString') {
-        const coords = r.geometry.coordinates.map(c => `${c[0]},${c[1]}`).join(' ');
-        kml += `      <LineString><coordinates>${coords}</coordinates></LineString>\n`;
-      } else if (r.geometry.type === 'Polygon') {
-        // Taking the first ring (outer boundary)
-        const coords = r.geometry.coordinates[0].map(c => `${c[0]},${c[1]}`).join(' ');
-        kml += `      <Polygon><outerBoundaryIs><LinearRing><coordinates>${coords}</coordinates></LinearRing></outerBoundaryIs></Polygon>\n`;
+    // Render Charts (Top 6)
+    function renderCharts(chartDataObj) {
+      const keys = Object.keys(chartDataObj).slice(0, 6);
+      const counts = keys.map(k => chartDataObj[k]);
+
+      const chartOptions = {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'right', labels: { color: getComputedStyle(document.body).getPropertyValue('--text-primary'), font: { family: 'Inter', size: 10 } } }
+        }
+      };
+
+      if (pieChart) pieChart.destroy();
+      if (barChart) barChart.destroy();
+
+      const ctxPie = document.getElementById('pieChart').getContext('2d');
+      pieChart = new Chart(ctxPie, {
+        type: 'doughnut',
+        data: { labels: keys, datasets: [{ data: counts, backgroundColor: CHART_COLORS, borderWidth: 0 }] },
+        options: chartOptions
+      });
+
+      const ctxBar = document.getElementById('barChart').getContext('2d');
+      barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: { labels: keys, datasets: [{ label: 'Jumlah', data: counts, backgroundColor: 'rgba(16, 185, 129, 0.8)', borderRadius: 4 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary'), font: { size: 10 } }, grid: { display: false } },
+            y: { ticks: { color: getComputedStyle(document.body).getPropertyValue('--text-secondary'), font: { size: 10 } }, grid: { color: getComputedStyle(document.body).getPropertyValue('--border') } }
+          }
+        }
+      });
+    }
+
+    // Handle Table Filter
+    function applyFilters() {
+      const term = document.getElementById('table-filter').value.toLowerCase();
+      const geom = document.getElementById('geom-filter') ? document.getElementById('geom-filter').value : 'all';
+
+      currentExportData = resultsArray.filter(r => {
+        const matchText = r.name.toLowerCase().includes(term) || r.tipe.toLowerCase().includes(term);
+        const matchGeom = geom === 'all' || r.geometry.type === geom;
+        return matchText && matchGeom;
+      });
+
+      updateTable(currentExportData);
+
+      // Recalculate chart data based on filter
+      let filteredChartMap = {};
+      currentExportData.forEach(r => { filteredChartMap[r.tipe] = (filteredChartMap[r.tipe] || 0) + 1; });
+      filteredChartMap = sortObjectByValue(filteredChartMap);
+      renderCharts(filteredChartMap);
+    }
+
+    document.getElementById('table-filter').addEventListener('input', applyFilters);
+    document.getElementById('geom-filter').addEventListener('change', applyFilters);
+
+    // Geocode Function
+    async function geocodeArea() {
+      const q = document.getElementById('area-input').value;
+      if (!q) return;
+
+      geocodeBtnIcon.className = 'fas fa-spinner fa-spin';
+      geocodeBtnText.innerText = 'Mencari...';
+      geocodeBtn.disabled = true;
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1`, { headers: { 'User-Agent': 'GeoScraperV3' } });
+        const data = await res.json();
+
+        if (!data.length) throw new Error('Lokasi tidak ditemukan');
+
+        const bb = data[0].boundingbox;
+        bbox = { s: +bb[0], n: +bb[1], w: +bb[2], e: +bb[3] };
+
+        if (window.bboxRect) map.removeLayer(window.bboxRect);
+        window.bboxRect = L.rectangle([[bbox.s, bbox.w], [bbox.n, bbox.e]], { color: 'var(--accent)', weight: 2, fillOpacity: 0.1 }).addTo(map);
+        map.fitBounds([[bbox.s, bbox.w], [bbox.n, bbox.e]]);
+
+        const displayName = data[0].display_name.split(',')[0];
+        statusDiv.innerHTML = `<span style="color:var(--accent)"><i class="fas fa-check"></i> Target: ${displayName}</span>`;
+        scrapeBtn.disabled = false;
+        addLog(`Geocode sukses: ${displayName}`, 'success');
+      } catch (e) {
+        statusDiv.innerHTML = `<span style="color:var(--danger)"><i class="fas fa-times"></i> ${e.message}</span>`;
+        toast(e.message, 'error');
+      } finally {
+        geocodeBtnIcon.className = 'fas fa-search';
+        geocodeBtnText.innerText = 'Cari';
+        geocodeBtn.disabled = false;
       }
-      kml += `    </Placemark>\n`;
+    }
+
+    // Data Export Functions
+    function downloadGeoJSON() {
+      if (!currentExportData.length) return toast('Tidak ada data untuk dieksport', 'error');
+      const fc = {
+        type: 'FeatureCollection',
+        features: currentExportData.map(r => ({
+          type: 'Feature',
+          geometry: r.geometry,
+          properties: { name: r.name, tipe: r.tipe, osm_id: r.osm_id }
+        }))
+      };
+      triggerDownload(JSON.stringify(fc), 'application/json', 'geoscraper_export.geojson');
+    }
+
+    function downloadCSV() {
+      if (!currentExportData.length) return toast('Tidak ada data untuk dieksport', 'error');
+      let csv = "No,Nama,Tipe,Lon,Lat,OSM_ID\n" + currentExportData.map(r => `${r.no},"${r.name.replace(/"/g, '""')}",${r.tipe},${r.lon},${r.lat},${r.osm_id}`).join("\n");
+      triggerDownload(csv, 'text/csv', 'geoscraper_export.csv');
+    }
+
+    function downloadKML() {
+      if (!currentExportData.length) return toast('Tidak ada data untuk dieksport', 'error');
+      let kml = `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n    <name>GeoScraper Export</name>\n`;
+
+      currentExportData.forEach(r => {
+        kml += `    <Placemark>\n      <name><![CDATA[${r.name}]]></name>\n`;
+        kml += `      <ExtendedData><Data name="tipe"><value>${r.tipe}</value></Data><Data name="osm_id"><value>${r.osm_id}</value></Data></ExtendedData>\n`;
+
+        if (r.geometry.type === 'Point') {
+          kml += `      <Point><coordinates>${r.geometry.coordinates[0]},${r.geometry.coordinates[1]}</coordinates></Point>\n`;
+        } else if (r.geometry.type === 'LineString') {
+          const coords = r.geometry.coordinates.map(c => `${c[0]},${c[1]}`).join(' ');
+          kml += `      <LineString><coordinates>${coords}</coordinates></LineString>\n`;
+        } else if (r.geometry.type === 'Polygon') {
+          // Taking the first ring (outer boundary)
+          const coords = r.geometry.coordinates[0].map(c => `${c[0]},${c[1]}`).join(' ');
+          kml += `      <Polygon><outerBoundaryIs><LinearRing><coordinates>${coords}</coordinates></LinearRing></outerBoundaryIs></Polygon>\n`;
+        }
+        kml += `    </Placemark>\n`;
+      });
+
+      kml += `  </Document>\n</kml>`;
+      triggerDownload(kml, 'application/vnd.google-earth.kml+xml', 'geoscraper_export.kml');
+    }
+
+    function triggerDownload(content, mimeType, filename) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([content], { type: mimeType }));
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      toast(`File ${filename} berhasil diunduh!`);
+    }
+
+    // Theme Toggle
+    function initTheme() {
+      const toggle = document.getElementById('darkModeToggle');
+      const icon = toggle.querySelector('i');
+
+      const applyTheme = (theme) => {
+        if (theme === 'light') {
+          document.body.classList.add('light');
+          icon.className = 'fas fa-sun';
+        } else {
+          document.body.classList.remove('light');
+          icon.className = 'fas fa-moon';
+        }
+        // Re-render charts to update label colors
+        if (Object.keys(fullChartMap).length > 0) renderCharts(fullChartMap);
+      };
+
+      // Load saved theme
+      if (localStorage.getItem('geoscraper_theme') === 'light') applyTheme('light');
+
+      toggle.onclick = () => {
+        const isLight = document.body.classList.contains('light');
+        const newTheme = isLight ? 'dark' : 'light';
+        applyTheme(newTheme);
+        localStorage.setItem('geoscraper_theme', newTheme);
+        toast(`Tema diubah ke ${newTheme === 'dark' ? 'Dark Mode' : 'Light Mode'}`);
+      };
+    }
+
+    // Clear Data
+    function clearMapData() {
+      if (markerClusterGroup) markerClusterGroup.clearLayers();
+      if (geoJsonLayer) geoJsonLayer.clearLayers();
+      if (window.bboxRect) { map.removeLayer(window.bboxRect); window.bboxRect = null; }
+      drawnItems.clearLayers();
+
+      resultsArray = [];
+      currentExportData = [];
+      fullChartMap = {};
+      bbox = null;
+      scrapeBtn.disabled = true;
+
+      document.getElementById('total-features').innerText = '0';
+      document.getElementById('scrape-progress-fill').style.width = '0%';
+      statusDiv.innerHTML = 'Area dibersihkan.';
+      document.getElementById('area-input').value = '';
+
+      updateTable([]);
+      if (pieChart) pieChart.destroy();
+      if (barChart) barChart.destroy();
+
+      addLog('Peta & data di-reset total.', 'error');
+      toast('Semua data dibersihkan');
+    }
+
+    // Setup Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
+      renderTags();
+      initTheme();
+
+      document.getElementById('cat-select').addEventListener('change', renderTags);
+      document.getElementById('geocode-btn').addEventListener('click', geocodeArea);
+      document.getElementById('area-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') geocodeArea(); });
+
+      document.getElementById('draw-btn').addEventListener('click', () => toast('Gunakan ikon Pentagon di sebelah kiri peta untuk menggambar area.', 'info'));
+      document.getElementById('scrape-btn').addEventListener('click', () => runBatchScrape());
+      document.getElementById('clear-map-btn').addEventListener('click', clearMapData);
+
+      document.getElementById('selectAllBtn').addEventListener('click', () => document.querySelectorAll('#tag-grid input').forEach(c => c.checked = true));
+      document.getElementById('clearAllBtn').addEventListener('click', () => document.querySelectorAll('#tag-grid input').forEach(c => c.checked = false));
+
+      document.getElementById('export-geojson').addEventListener('click', downloadGeoJSON);
+      document.getElementById('export-csv').addEventListener('click', downloadCSV);
+      document.getElementById('export-kml').addEventListener('click', downloadKML);
+
+      document.getElementById('toggleRightPanel').addEventListener('click', () => document.getElementById('rightPanel').classList.add('open'));
+      document.getElementById('closeRightPanel').addEventListener('click', () => document.getElementById('rightPanel').classList.remove('open'));
+
+      addLog('Sistem GeoScraper siap digunakan.', 'success');
     });
-    
-    kml += `  </Document>\n</kml>`;
-    triggerDownload(kml, 'application/vnd.google-earth.kml+xml', 'geoscraper_export.kml');
-  }
-
-  function triggerDownload(content, mimeType, filename) {
-    const a = document.createElement('a'); 
-    a.href = URL.createObjectURL(new Blob([content], {type: mimeType})); 
-    a.download = filename; 
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    toast(`File ${filename} berhasil diunduh!`);
-  }
-  
-  // Theme Toggle
-  function initTheme() { 
-    const toggle = document.getElementById('darkModeToggle'); 
-    const icon = toggle.querySelector('i');
-    
-    const applyTheme = (theme) => {
-      if(theme === 'light') {
-        document.body.classList.add('light');
-        icon.className = 'fas fa-sun';
-      } else {
-        document.body.classList.remove('light');
-        icon.className = 'fas fa-moon';
-      }
-      // Re-render charts to update label colors
-      if(Object.keys(fullChartMap).length > 0) renderCharts(fullChartMap);
-    };
-
-    // Load saved theme
-    if(localStorage.getItem('geoscraper_theme') === 'light') applyTheme('light');
-    
-    toggle.onclick = () => { 
-      const isLight = document.body.classList.contains('light');
-      const newTheme = isLight ? 'dark' : 'light';
-      applyTheme(newTheme);
-      localStorage.setItem('geoscraper_theme', newTheme);
-      toast(`Tema diubah ke ${newTheme === 'dark' ? 'Dark Mode' : 'Light Mode'}`);
-    }; 
-  }
-  
-  // Clear Data
-  function clearMapData() { 
-    if(markerClusterGroup) markerClusterGroup.clearLayers(); 
-    if(geoJsonLayer) geoJsonLayer.clearLayers(); 
-    if(window.bboxRect) { map.removeLayer(window.bboxRect); window.bboxRect = null; }
-    drawnItems.clearLayers();
-    
-    resultsArray = []; 
-    currentExportData = [];
-    fullChartMap = {};
-    bbox = null;
-    scrapeBtn.disabled = true;
-    
-    document.getElementById('total-features').innerText = '0'; 
-    document.getElementById('scrape-progress-fill').style.width = '0%';
-    statusDiv.innerHTML = 'Area dibersihkan.';
-    document.getElementById('area-input').value = '';
-    
-    updateTable([]); 
-    if(pieChart) pieChart.destroy(); 
-    if(barChart) barChart.destroy(); 
-    
-    addLog('Peta & data di-reset total.', 'error'); 
-    toast('Semua data dibersihkan'); 
-  }
-  
-  // Setup Event Listeners
-  document.addEventListener('DOMContentLoaded', () => {
-    initMap(); 
-    renderTags(); 
-    initTheme();
-    
-    document.getElementById('cat-select').addEventListener('change', renderTags);
-    document.getElementById('geocode-btn').addEventListener('click', geocodeArea);
-    document.getElementById('area-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') geocodeArea(); });
-    
-    document.getElementById('draw-btn').addEventListener('click', () => toast('Gunakan ikon Pentagon di sebelah kiri peta untuk menggambar area.', 'info'));
-    document.getElementById('scrape-btn').addEventListener('click', () => runBatchScrape());
-    document.getElementById('clear-map-btn').addEventListener('click', clearMapData);
-    
-    document.getElementById('selectAllBtn').addEventListener('click', () => document.querySelectorAll('#tag-grid input').forEach(c => c.checked=true));
-    document.getElementById('clearAllBtn').addEventListener('click', () => document.querySelectorAll('#tag-grid input').forEach(c => c.checked=false));
-    
-    document.getElementById('export-geojson').addEventListener('click', downloadGeoJSON);
-    document.getElementById('export-csv').addEventListener('click', downloadCSV);
-    document.getElementById('export-kml').addEventListener('click', downloadKML);
-    
-    document.getElementById('toggleRightPanel').addEventListener('click', () => document.getElementById('rightPanel').classList.add('open'));
-    document.getElementById('closeRightPanel').addEventListener('click', () => document.getElementById('rightPanel').classList.remove('open'));
-    
-    addLog('Sistem GeoScraper V3 siap digunakan.', 'success');
-  });
-</script>
+  </script>
 </body>
+
 </html>
