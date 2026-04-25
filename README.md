@@ -3,7 +3,7 @@
 GeoScraper adalah aplikasi web berbasis GIS yang dirancang untuk mengekstrak (scrape), memvisualisasikan, dan mengolah data dari **OpenStreetMap (OSM)** secara masif (*batch-scraping*) dengan antarmuka *dashboard* modern.
 
 👨‍💻 **Dibuat oleh:** [Radhyka Galih Pranata](https://www.linkedin.com/in/radhyka-galih-pranata-b78249209)  
-🔗 **Repository:** [github.com/radika27/GeoScraper](https://github.com/radika27/GeoScraper)
+🔗 **Repository:** [github.com/radika27/GeoScraper](https://radika27.github.io/GeoScraper)
 
 ---
 
